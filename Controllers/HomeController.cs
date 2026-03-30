@@ -13,7 +13,8 @@ namespace PRReviewDemo.Controllers
     {
         public ActionResult Index()
         {
-            return View();
+            ViewBag.Message = "Welcome to the home page!";
+			return View();
         }
 
         public ActionResult About()
