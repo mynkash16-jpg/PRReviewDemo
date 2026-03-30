@@ -6,7 +6,10 @@ using System.Web.Mvc;
 
 namespace PRReviewDemo.Controllers
 {
-    public class HomeController : Controller
+	/// <summary>
+	/// Default home controller for the application. This controller contains actions for the home page, about page, and contact page.
+	/// </summary>
+	public class HomeController : Controller
     {
         public ActionResult Index()
         {
