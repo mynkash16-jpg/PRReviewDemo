@@ -17,7 +17,6 @@ namespace PRReviewDemo.Controllers
             return View();
         }
 
-        // GET: User/Details/5
         public ActionResult Details(int id)
         {
             return View();
@@ -31,6 +30,7 @@ namespace PRReviewDemo.Controllers
 
         // POST: User/Create
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Create(FormCollection collection)
         {
             try

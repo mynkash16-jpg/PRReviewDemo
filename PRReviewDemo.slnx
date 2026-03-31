@@ -1,4 +1,4 @@
 <Solution>
-  <Project Path="../PRReviewDemo.Tests/PRReviewDemo.Tests.csproj" />
-  <Project Path="PRReviewDemo.csproj" />
+  <Project Path="../PRReviewDemo.Tests/PRReviewDemo.Tests.csproj" Id="4daf721f-b2e8-49dd-bc47-8e6e0e68d760" />
+  <Project Path="PRReviewDemo.csproj" Id="5d43eed1-03de-4152-b7cb-a589f802f020" />
 </Solution>
