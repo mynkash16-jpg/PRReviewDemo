@@ -1,0 +1,358 @@
+{
+	"nodes": [
+		{
+			"parameters": {
+				"model": {
+					"__rl": true,
+					"value": "gpt-4.1-mini",
+					"mode": "list",
+					"cachedResultName": "gpt-4.1-mini"
+				},
+				"options": {}
+			},
+			"id": "62ef8e9f-df1a-46dd-b025-a206ac888f97",
+			"name": "OpenAI Chat Model",
+			"type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+			"position": [
+				1152,
+				640
+			],
+			"typeVersion": 1.2,
+			"credentials": {
+				"openAiApi": {
+					"id": "Vrse6l8VokvaX8rL",
+					"name": "n8n free OpenAI API credits"
+				}
+			}
+		},
+		{
+			"parameters": {
+				"authentication": "oAuth2",
+				"owner": {
+					"__rl": true,
+					"value": "mynkash16-jpg",
+					"mode": "name"
+				},
+				"repository": {
+					"__rl": true,
+					"value": "PRReviewDemo",
+					"mode": "list",
+					"cachedResultName": "PRReviewDemo",
+					"cachedResultUrl": "https://github.com/mynkash16-jpg/PRReviewDemo"
+				},
+				"events": [
+					"pull_request"
+				],
+				"options": {}
+			},
+			"id": "35361983-8c66-457e-8cb6-7585a18f8aaf",
+			"name": "PR Trigger",
+			"type": "n8n-nodes-base.githubTrigger",
+			"position": [
+				512,
+				432
+			],
+			"webhookId": "2b8ec7bd-e65b-46d2-a2d9-082b137dd880",
+			"notesInFlow": false,
+			"typeVersion": 1,
+			"credentials": {
+				"githubOAuth2Api": {
+					"id": "MTyHlGe7rFvHs3d2",
+					"name": "GitHub account"
+				}
+			}
+		},
+		{
+			"parameters": {
+				"url": "=https://api.github.com/repos/{{$json.body.sender.login}}/{{$json.body.repository.name}}/pulls/{{$json.body.number}}/files",
+				"authentication": "genericCredentialType",
+				"genericAuthType": "httpBearerAuth",
+				"options": {}
+			},
+			"id": "25d17a0d-c409-406d-bd97-00ec71261c16",
+			"name": "Get file's Diffs from PR",
+			"type": "n8n-nodes-base.httpRequest",
+			"position": [
+				736,
+				432
+			],
+			"typeVersion": 4.2,
+			"credentials": {
+				"httpBearerAuth": {
+					"id": "7tWqPUFNfx5RwqvE",
+					"name": "Bearer Auth account"
+				}
+			}
+		},
+		{
+			"parameters": {
+				"jsCode": "const files = $input.all().map(item => item.json);\n\nlet diffs = '';\n\nfor (const file of files) {\n  diffs += `### File : ${file.filename}\\n\\n`;\n\n  if (file.patch) {\n   const safePatch = file.patch.replace(/```/g, \"''\");\n\n    diffs += \"```diff\\n\";\n    diffs += safePatch;\n    diffs += \"\\n```\\n\";\n  } else {\n    diffs += \"No patch avaliable, may be binery file)._\";\n  }\n\n  diffs += \"\\n---\\n\\n\";\n}\n\nconst userMessage = `\nYou are a senior dot net developer and solution architect. \nPlease review the following code changes in these files :\n\n${diffs}\n\n---\n\nYour mission:\n\n- Review the proposed code changes file by file and by significant modification.\n\n- Generate inline comments on the relevant lines of code.\n\n- Ignore files without patches.\n\n- Do not repeat the code snippet or the filename.\n\n- Write the comments directly, without introducing the context.\n\n- Review use of sync and async use for performance perespective.\n- Review implementation against web security threats e.g. XSRF, XSS, Authorization, etc. \n- Refer project specefic guidelines from the excel sheet and also review code for specific guidelines\n`;\n\nreturn [\n  {\n    json: {\n      user_message: userMessage.trim()\n    }\n  }\n];"
+			},
+			"id": "f984f872-c4b0-4752-bc54-1f311fa36feb",
+			"name": "Create target Prompt from PR Diffs",
+			"type": "n8n-nodes-base.code",
+			"position": [
+				960,
+				432
+			],
+			"typeVersion": 2
+		},
+		{
+			"parameters": {
+				"resource": "review",
+				"owner": {
+					"__rl": true,
+					"value": "mynkash16-jpg",
+					"mode": "name"
+				},
+				"repository": {
+					"__rl": true,
+					"value": "PRReviewDemo",
+					"mode": "list",
+					"cachedResultName": "PRReviewDemo",
+					"cachedResultUrl": "https://github.com/mynkash16-jpg/PRReviewDemo"
+				},
+				"pullRequestNumber": "={{ $('PR Trigger').first().json.body.number }}",
+				"event": "comment",
+				"body": "={{ $json.output }}",
+				"additionalFields": {}
+			},
+			"id": "0d9790b1-9818-4e73-a202-57d4db039b35",
+			"name": "GitHub Robot",
+			"type": "n8n-nodes-base.github",
+			"position": [
+				1552,
+				432
+			],
+			"webhookId": "39c2fe8b-f686-4699-8450-2a5b4c263d93",
+			"typeVersion": 1.1,
+			"credentials": {
+				"githubApi": {
+					"id": "znHvnKWPCEJW5uWh",
+					"name": "GitHub account 2"
+				}
+			}
+		},
+		{
+			"parameters": {
+				"operation": "edit",
+				"owner": {
+					"__rl": true,
+					"value": "mynkash16-jpg",
+					"mode": "name"
+				},
+				"repository": {
+					"__rl": true,
+					"value": "PRReviewDemo",
+					"mode": "list",
+					"cachedResultName": "PRReviewDemo",
+					"cachedResultUrl": "https://github.com/mynkash16-jpg/PRReviewDemo"
+				},
+				"issueNumber": "={{ $('PR Trigger').first().json.body.number }}",
+				"editFields": {
+					"labels": [
+						{
+							"label": "ReviewedByAI"
+						}
+					]
+				}
+			},
+			"id": "234c235c-a88d-412b-b7b1-f9f0cc8eead9",
+			"name": "Add Label to PR",
+			"type": "n8n-nodes-base.github",
+			"position": [
+				1776,
+				432
+			],
+			"webhookId": "c98f39f1-603b-4013-9149-53b4cc31b611",
+			"typeVersion": 1,
+			"credentials": {
+				"githubApi": {
+					"id": "znHvnKWPCEJW5uWh",
+					"name": "GitHub account 2"
+				}
+			}
+		},
+		{
+			"parameters": {
+				"content": "**3-Create Prompt from diffs**\nThis Code node runs a JavaScript snippet to:\n-Parse file diffs from the previous HTTP Request node\n-Format each diff with its file name\n-Build a structured natural language prompt for the AI agent\n\nThe final output is a clear, contextual instruction like:\n*\"You are a senior iOS developer. Please review the following code changes in these files...\"*\n",
+				"height": 240,
+				"width": 360,
+				"color": 2
+			},
+			"id": "c201133c-3d54-4fe0-8442-11ff92dcc89e",
+			"name": "Sticky Note2",
+			"type": "n8n-nodes-base.stickyNote",
+			"position": [
+				832,
+				160
+			],
+			"typeVersion": 1
+		},
+		{
+			"parameters": {
+				"content": "**Comment Poster**\nPost comment.",
+				"height": 80,
+				"width": 150,
+				"color": 5
+			},
+			"id": "6f6c78b2-ad75-43fa-a082-9f345f9b5f30",
+			"name": "Sticky Note3",
+			"type": "n8n-nodes-base.stickyNote",
+			"position": [
+				1520,
+				320
+			],
+			"typeVersion": 1
+		},
+		{
+			"parameters": {
+				"promptType": "define",
+				"text": "={{ $json.user_message }}",
+				"options": {}
+			},
+			"id": "ac7b6754-2bef-408d-8f53-fb51ece1673e",
+			"name": "Code Review Agent",
+			"type": "@n8n/n8n-nodes-langchain.agent",
+			"position": [
+				1168,
+				432
+			],
+			"typeVersion": 1.9
+		},
+		{
+			"parameters": {
+				"content": "**PR Labeler**\nadds a label like *ReviewedByAI* .",
+				"height": 80,
+				"width": 150,
+				"color": 7
+			},
+			"id": "30655e04-f429-40bb-b6b7-9a11ffa4e607",
+			"name": "Sticky Note4",
+			"type": "n8n-nodes-base.stickyNote",
+			"position": [
+				1776,
+				336
+			],
+			"typeVersion": 1
+		},
+		{
+			"parameters": {
+				"documentId": {
+					"__rl": true,
+					"value": "1bnnkYckbtNZ1GN3pHr9NUx8aBQSPHW5YogC26EYtZ6o",
+					"mode": "list",
+					"cachedResultName": "Coding Guidelines",
+					"cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bnnkYckbtNZ1GN3pHr9NUx8aBQSPHW5YogC26EYtZ6o/edit?usp=drivesdk"
+				},
+				"sheetName": {
+					"__rl": true,
+					"value": "gid=0",
+					"mode": "list",
+					"cachedResultName": "sheet1",
+					"cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bnnkYckbtNZ1GN3pHr9NUx8aBQSPHW5YogC26EYtZ6o/edit#gid=0"
+				},
+				"options": {}
+			},
+			"type": "n8n-nodes-base.googleSheetsTool",
+			"typeVersion": 4.7,
+			"position": [
+				1328,
+				640
+			],
+			"id": "b8299ec1-455c-422a-9ddb-5670c93899fd",
+			"name": "Get row(s) in sheet in Google Sheets",
+			"credentials": {
+				"googleSheetsOAuth2Api": {
+					"id": "erhx77ZN0jzj9EkM",
+					"name": "Google Sheets OAuth2 API-Demo"
+				}
+			}
+		}
+	],
+	"connections": {
+		"OpenAI Chat Model": {
+			"ai_languageModel": [
+				[
+					{
+						"node": "Code Review Agent",
+						"type": "ai_languageModel",
+						"index": 0
+					}
+				]
+			]
+		},
+		"PR Trigger": {
+			"main": [
+				[
+					{
+						"node": "Get file's Diffs from PR",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Get file's Diffs from PR": {
+			"main": [
+				[
+					{
+						"node": "Create target Prompt from PR Diffs",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Create target Prompt from PR Diffs": {
+			"main": [
+				[
+					{
+						"node": "Code Review Agent",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"GitHub Robot": {
+			"main": [
+				[
+					{
+						"node": "Add Label to PR",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Code Review Agent": {
+			"main": [
+				[
+					{
+						"node": "GitHub Robot",
+						"type": "main",
+						"index": 0
+					}
+				]
+			]
+		},
+		"Get row(s) in sheet in Google Sheets": {
+			"ai_tool": [
+				[
+					{
+						"node": "Code Review Agent",
+						"type": "ai_tool",
+						"index": 0
+					}
+				]
+			]
+		}
+	},
+	"pinData": {},
+	"meta": {
+		"templateId": "3804",
+		"templateCredsSetupCompleted": true,
+		"instanceId": "4fb058c49501c0478de93cc72cf7d0fc17aad43459cfa8a351e7fbbca14fd4e3"
+	}
+}
