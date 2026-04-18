@@ -11,6 +11,7 @@ namespace PRReviewDemo.Controllers
 	/// </summary>
 	public class HomeController : Controller
     {
+	/// This is not proper summery
         public ActionResult Index()
         {
             ViewBag.Message = "Welcome to the home page!";
@@ -20,7 +21,7 @@ namespace PRReviewDemo.Controllers
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";
-
+			int i = 0;
             return View();
         }
 
