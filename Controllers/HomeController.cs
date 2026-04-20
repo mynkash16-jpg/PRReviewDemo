@@ -11,13 +11,14 @@ namespace PRReviewDemo.Controllers
 	/// </summary>
 	public class HomeController : Controller
     {
-	/// This is not proper summery
+	    /// This is not proper summery
         public ActionResult Index()
         {
             ViewBag.Message = "Welcome to the home page!";
 			return View();
         }
-// This is about action method
+
+        // This is about action method
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";
