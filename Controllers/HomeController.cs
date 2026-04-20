@@ -17,7 +17,7 @@ namespace PRReviewDemo.Controllers
             ViewBag.Message = "Welcome to the home page!";
 			return View();
         }
-
+// This is about action method
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";
