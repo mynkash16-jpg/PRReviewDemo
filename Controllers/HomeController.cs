@@ -10,11 +10,17 @@ namespace PRReviewDemo.Controllers
     {
         public ActionResult Index()
         {
+            ViewBag.Abc = "xyz";
             return View();
         }
 
+        /// <summary>
+        /// This is index action
+        /// </summary>
+        /// <returns></returns>
         public ActionResult About()
         {
+            int i=0
             ViewBag.Message = "Your application description page.";
 
             return View();
