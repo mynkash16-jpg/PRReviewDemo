@@ -27,4 +27,12 @@ namespace PRReviewDemo.Controllers
             return View();
         }
     }
+
+    public class User
+    {
+        /// <summary>
+        /// id property
+        /// </summary>
+        public int Id { get; set; }
+    }
 }
