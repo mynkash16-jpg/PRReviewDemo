@@ -11,7 +11,8 @@ namespace PRReviewDemo.Controllers
         // GET: Customer
         public ActionResult Index()
         {
-            return View();
+            ViewBag.Message = "Customer List";
+			return View();
         }
 
         // GET: Customer/Details/5
