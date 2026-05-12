@@ -17,7 +17,10 @@ namespace PRReviewDemo.Controllers
         // GET: Customer/Details/5
         public ActionResult Details(int id)
         {
-            return View();
+            ICustomerRepository customerRepository = new CustomerRepository();
+			return View(customerRepository.GetCustomerById(id));
+            //Get customer by id and return to view
+
         }
 
         // GET: Customer/Create
@@ -47,9 +50,18 @@ namespace PRReviewDemo.Controllers
     {
         public int Id { get; set; }
 
-		/// <summary>
-		/// id property
-		/// </summary>
-		public string name { get; set; }
+        /// <summary>
+        /// id property
+        /// </summary>
+        public string name { get; set; }
+    }
+
+    class CustomerRepository : ICustomerRepository
+	{
+        public Customer GetCustomerById(int id)
+        {
+            //Get customer by id from database
+            return new Customer() { Id = id, name = "John Doe" };
+		}
     }
 }
